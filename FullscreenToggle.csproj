@@ -54,4 +54,17 @@
     <EmbeddedResource Include="icon.ico" LogicalName="FullscreenToggle.icon.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Without this the default SDK glob (**/*.cs) also picks up the test project's sources. -->
+    <Compile Remove="tests\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Lets the test project call the internal hotkey parsing/formatting logic directly
+         instead of that logic needing to be made public just to be testable. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>FullscreenToggle.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>

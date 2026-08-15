@@ -1,5 +1,7 @@
 # FullscreenToggle
 
+[![Build](https://github.com/PromoFaux/FullscreenToggle/actions/workflows/build.yml/badge.svg)](https://github.com/PromoFaux/FullscreenToggle/actions/workflows/build.yml)
+
 A tray-resident hotkey utility. Press a global hotkey and the active window flips between its
 normal framed state and a borderless, always-on-top, monitor-height 16:9 window centered on
 whichever monitor it's currently on. Press it again and the window goes back exactly where it
@@ -51,6 +53,22 @@ The usual way to shrink it is trimming, but the SDK refuses to trim Windows Form
 prerequisite, or 47 MB without one. Nothing in between is available.
 
 Requires the **.NET SDK 10** to build (verified against 10.0.400).
+
+```bash
+dotnet test
+```
+
+Runs [tests/FullscreenToggle.Tests](tests/FullscreenToggle.Tests), which covers the hotkey
+text parsing/formatting and JSON round-tripping in [AppSettings.cs](AppSettings.cs) — the
+logic most likely to break in a way that only shows up as a corrupted settings file.
+
+## Releases
+
+Pushing a tag matching `vX.Y.Z` runs
+[release.yml](.github/workflows/release.yml): it builds both variants with that version baked
+into the exe (`-p:Version=X.Y.Z`), zips them, and attaches both zips to a GitHub release
+created from the tag. The tag is the only place a release's version lives — nothing in the
+repo needs bumping beforehand.
 
 ## Settings
 
