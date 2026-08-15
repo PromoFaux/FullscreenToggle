@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- .NET 10 is the current LTS and matches the runtime already on this machine.
+         Change to net8.0-windows if you'd rather stay on 8; nothing else needs to change. -->
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>FullscreenToggle</AssemblyName>
+    <RootNamespace>FullscreenToggle</RootNamespace>
+
+    <!-- PerMonitorV2 DPI awareness. Without it Windows virtualizes the coordinates we
+         pass to SetWindowPos on high-DPI monitors and the window ends up the wrong
+         size/position. These three feed the generated ApplicationConfiguration.Initialize(). -->
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationVisualStyles>true</ApplicationVisualStyles>
+    <ApplicationUseCompatibleTextRendering>false</ApplicationUseCompatibleTextRendering>
+
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <!-- Two ways to ship, both a single .exe:
+
+         dotnet publish -c Release                     -> ~0.6 MB, needs .NET Desktop Runtime
+         dotnet publish -c Release -p:Standalone=true  -> ~47 MB, needs nothing installed
+
+       The 47 MB in the standalone build is the .NET runtime itself. Trimming would shrink
+       it, but the SDK refuses to trim Windows Forms (NETSDK1175) and NativeAOT doesn't
+       support WinForms either - so these two are the only options available. -->
+  <PropertyGroup Condition="'$(Standalone)' != 'true'">
+    <SelfContained>false</SelfContained>
+    <!-- Compression is only legal for self-contained bundles (NETSDK1176). -->
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    <!-- Run on whatever runtime the target actually has. Without this, a machine with only
+         .NET 11 or 12 installed refuses to start an app built against 10. -->
+    <RollForward>LatestMajor</RollForward>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Standalone)' == 'true'">
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Same file twice: ApplicationIcon is what Explorer/the taskbar show for the exe,
+         the EmbeddedResource is what AppIcon reads at runtime for the tray and dialog. -->
+    <EmbeddedResource Include="icon.ico" LogicalName="FullscreenToggle.icon.ico" />
+  </ItemGroup>
+
+</Project>
