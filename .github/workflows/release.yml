@@ -58,12 +58,23 @@ jobs:
             -Path publish/standalone/FullscreenToggle.exe `
             -DestinationPath "artifacts/FullscreenToggle-${{ steps.version.outputs.version }}-win-x64-standalone.zip"
 
-      - name: Create release
+      # Idempotent: a release for this tag may already exist (created by hand from the
+      # GitHub UI, which also happily creates the tag) or from a previous run of this
+      # workflow being re-triggered against the same tag. Either way, upload wins.
+      - name: Create or update release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create "${{ github.ref_name }}"
-          "artifacts/FullscreenToggle-${{ steps.version.outputs.version }}-win-x64.zip"
-          "artifacts/FullscreenToggle-${{ steps.version.outputs.version }}-win-x64-standalone.zip"
-          --title "${{ github.ref_name }}"
-          --generate-notes
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $assets = @(
+            "artifacts/FullscreenToggle-${{ steps.version.outputs.version }}-win-x64.zip"
+            "artifacts/FullscreenToggle-${{ steps.version.outputs.version }}-win-x64-standalone.zip"
+          )
+
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag @assets --clobber
+          } else {
+            gh release create $tag @assets --title $tag --generate-notes
+          }
