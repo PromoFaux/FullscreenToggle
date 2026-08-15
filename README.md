@@ -135,6 +135,10 @@ Some windows refuse to be restyled — anything running elevated (unless this ap
 too), UWP/store apps, and games that reassert their own styles every frame. The toggle is a
 no-op for those.
 
+## License
+
+[MIT](LICENSE)
+
 ---
 
 *Inspired by a DisplayFusion "borderless 16:9" script; this is a standalone reimplementation
