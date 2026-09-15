@@ -130,8 +130,11 @@ it is.
 - **Topmost is cleared when restoring a maximized window**, via an explicit `HWND_NOTOPMOST`
   call before `ShowWindow` — otherwise the window would stay pinned above everything else
   forever.
-- **`SWP_FRAMECHANGED` is passed to `SetWindowPos`** so the non-client area actually
-  recalculates after the style change instead of leaving frame remnants.
+- **`SetWindowPos` is called with no flags (`0`)**, matching the reference script rather than
+  passing `SWP_FRAMECHANGED`. That flag forces a `WM_NCCALCSIZE` non-client recalculation,
+  which some fullscreen-capable games treat as a cue to renegotiate their display/swap-chain
+  state — causing a brief black screen on toggle. Dropping it can leave frame remnants on a
+  window that doesn't repaint its own border after a style change; none observed so far.
 - **Dead handles are pruned** from the saved-state dictionary on each save, since a
   long-running tray app would otherwise accumulate entries for closed windows.
 - **Per-monitor v2 DPI awareness** is enabled via `ApplicationHighDpiMode` in the .csproj.

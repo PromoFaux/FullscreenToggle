@@ -69,9 +69,11 @@ internal static class WindowToggler
         int x = monitor.X + (monitor.Width - targetWidth) / 2;
         int y = monitor.Y;
 
-        // HWND_TOPMOST is what puts it above the taskbar.
-        NativeMethods.SetWindowPos(
-            hwnd, NativeMethods.HWND_TOPMOST, x, y, targetWidth, targetHeight, NativeMethods.SWP_FRAMECHANGED);
+        // HWND_TOPMOST is what puts it above the taskbar. No SWP_FRAMECHANGED, matching the
+        // reference script - some fullscreen-capable games treat that flag's forced
+        // WM_NCCALCSIZE as a cue to renegotiate exclusive/flip-mode display state, which is
+        // what causes a brief black screen on toggle for those apps.
+        NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOPMOST, x, y, targetWidth, targetHeight, 0);
     }
 
     private static void ExitFullscreen(IntPtr hwnd, int style)
@@ -90,7 +92,7 @@ internal static class WindowToggler
             // maximized windows permanently pinned above everything else.
             NativeMethods.SetWindowPos(
                 hwnd, NativeMethods.HWND_NOTOPMOST, 0, 0, 0, 0,
-                NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_FRAMECHANGED);
+                NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE);
 
             NativeMethods.ShowWindow(hwnd, NativeMethods.SW_MAXIMIZE);
         }
@@ -98,8 +100,7 @@ internal static class WindowToggler
         {
             NativeMethods.SetWindowPos(
                 hwnd, NativeMethods.HWND_NOTOPMOST,
-                saved.Bounds.X, saved.Bounds.Y, saved.Bounds.Width, saved.Bounds.Height,
-                NativeMethods.SWP_FRAMECHANGED);
+                saved.Bounds.X, saved.Bounds.Y, saved.Bounds.Width, saved.Bounds.Height, 0);
         }
     }
 

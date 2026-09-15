@@ -31,7 +31,6 @@ internal static class NativeMethods
 
     public const uint SWP_NOSIZE = 0x0001;
     public const uint SWP_NOMOVE = 0x0002;
-    public const uint SWP_FRAMECHANGED = 0x0020; // forces the non-client area to recalculate
 
     /// <summary>Moves, resizes and re-orders a window in one call.</summary>
     [DllImport("user32.dll", SetLastError = true)]
